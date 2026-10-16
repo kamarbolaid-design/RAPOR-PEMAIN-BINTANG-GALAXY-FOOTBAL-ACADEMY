@@ -68,12 +68,12 @@ def buat_pdf(nama, tempat_lahir, tanggal_lahir, usia, posisi_kategori, peran_spe
         pdf.cell(0, 8, "BINTANG GALAXY FOOTBALL ACADEMY", ln=True, align='L')
         pdf.set_xy(40, 23)
         pdf.set_font("Arial", 'I', 11)
-        pdf.cell(0, 6, f"Rapor Evaluasi Perkembangan Pemain U17 | Periode: {periode_bulan} {periode_tahun}", ln=True, align='L')
+        pdf.cell(0, 6, f"Rapor Evaluasi Perkembangan Pemain  | Periode: {periode_bulan} {periode_tahun}", ln=True, align='L')
         pdf.line(10, 40, 200, 40)
         pdf.ln(15)
     else:
         pdf.set_font("Arial", 'B', 16)
-        pdf.cell(0, 10, "RAPOR EVALUASI PEMAIN U17", ln=True, align='C')
+        pdf.cell(0, 10, "RAPOR EVALUASI PEMAIN", ln=True, align='C')
         pdf.set_font("Arial", 'B', 14)
         pdf.cell(0, 10, "BINTANG GALAXY FOOTBALL ACADEMY", ln=True, align='C')
         pdf.set_font("Arial", 'I', 12)
@@ -170,7 +170,7 @@ def buat_pdf(nama, tempat_lahir, tanggal_lahir, usia, posisi_kategori, peran_spe
 # ==========================================
 # TAMPILAN UTAMA APLIKASI
 # ==========================================
-st.title("⚽ Rapor Evaluasi Pemain U17")
+st.title("⚽ Rapor Evaluasi Pemain ")
 st.subheader("Bintang Galaxy Football Academy")
 st.write("---")
 
