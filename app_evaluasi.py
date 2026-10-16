@@ -218,12 +218,13 @@ nilai_baru["First Touch (Kontrol bola)"] = st.slider("First Touch", 1, 5, 3)
 nilai_baru["Dribbling (Melewati lawan)"] = st.slider("Dribbling", 1, 5, 3)
 nilai_baru["Shooting / Finishing"] = st.slider("Shooting / Finishing", 1, 5, 3)
 nilai_baru["Heading (Teknik sundulan)"] = st.slider("Heading", 1, 5, 3)
+# Poin Tambahan Teknik
+nilai_baru["Long Ball / Direct Ball (Umpan Jauh)"] = st.slider("Long Ball / Direct Ball", 1, 5, 3)
 
 st.markdown("### 2. Aspek Taktik & Pertandingan (Tactical Understanding)")
 nilai_baru["Pengambilan Keputusan"] = st.slider("Pengambilan Keputusan", 1, 5, 3)
 nilai_baru["Kesadaran Ruang"] = st.slider("Kesadaran Ruang", 1, 5, 3)
 nilai_baru["Transisi (Positif/Negatif)"] = st.slider("Transisi", 1, 5, 3)
-# Poin Tambahan Taktik
 nilai_baru["Scanning Rate / Orientasi Lapangan"] = st.slider("Scanning Rate / Orientasi Lapangan", 1, 5, 3)
 nilai_baru["Body Shape & Body Language"] = st.slider("Body Shape & Body Language", 1, 5, 3)
 nilai_baru["1v1 Defending Mechanics"] = st.slider("1v1 Defending Mechanics", 1, 5, 3)
