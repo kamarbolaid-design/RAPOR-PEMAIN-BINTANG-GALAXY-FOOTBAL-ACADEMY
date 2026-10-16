@@ -7,12 +7,68 @@ import os
 # Konfigurasi Halaman
 st.set_page_config(page_title="Sistem Evaluasi Bintang Galaxy", layout="centered")
 
+# ==========================================
+# 0. SISTEM KEAMANAN & LOGIN
+# ==========================================
+# DAFARKAN USERNAME DAN PASSWORD PELATIH DI SINI
+USER_DATABASE = {
+    "coach": "bintang123",       # Username: coach | Password: bintang123
+    "admin": "galaxy2026",       # Username: admin | Password: galaxy2026
+}
+
+# Inisialisasi status login
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "user_fullname" not in st.session_state:
+    st.session_state.user_fullname = ""
+
+def proses_login(username, password):
+    if username in USER_DATABASE and USER_DATABASE[username] == password:
+        st.session_state.logged_in = True
+        st.session_state.user_fullname = username.upper()
+        st.success("✅ Login berhasil!")
+    else:
+        st.error("❌ Username atau Password salah!")
+
+def proses_logout():
+    st.session_state.logged_in = False
+    st.session_state.user_fullname = ""
+
+# --- TAMPILAN HALAMAN LOGIN (JIKA BELUM LOGIN) ---
+if not st.session_state.logged_in:
+    st.title("🔒 Akses Terbatas")
+    st.subheader("Bintang Galaxy Football Academy")
+    st.write("Silakan login menggunakan akun pelatih untuk mengakses Sistem Evaluasi Rapor.")
+    
+    with st.form("form_login"):
+        username_input = st.text_input("Username")
+        password_input = st.text_input("Password", type="password")
+        tombol_login = st.form_submit_button("Masuk / Login", type="primary")
+        
+        if tombol_login:
+            proses_login(username_input, password_input)
+            if st.session_state.logged_in:
+                st.rerun()
+
+    st.caption(" Hubungi tim IT / Manajemen jika Anda lupa kata sandi.")
+    st.stop()  # Menghentikan eksekusi kode di bawah jika belum login
+
+# ==========================================
+# JIKA SUDAH LOGIN, HALAMAN UTAMA AKAN DIBUKA
+# ==========================================
+
+# Tombol Logout di Sidebar (Menu Samping)
+st.sidebar.markdown(f"**👤 Login sebagai:** {st.session_state.user_fullname}")
+if st.sidebar.button("🚪 Logout / Keluar"):
+    proses_logout()
+    st.rerun()
+
 # --- FUNGSI PEMBUAT PDF DENGAN LOGO, FOTO & PERIODE ---
 def buat_pdf(nama, tempat_lahir, tanggal_lahir, usia, posisi, dict_nilai, catatan, rata_rata, predikat, periode_bulan, periode_tahun, path_logo=None, path_foto=None):
     pdf = FPDF()
     pdf.add_page()
     
-    # Header / Kop Surat dengan Logo & Periode
+    # Header / Kop Surat
     if path_logo and os.path.exists(path_logo):
         pdf.image(path_logo, x=10, y=10, w=25)
         pdf.set_xy(40, 15)
@@ -104,7 +160,7 @@ def buat_pdf(nama, tempat_lahir, tanggal_lahir, usia, posisi, dict_nilai, catata
     pdf.output(nama_file)
     return nama_file
 
-# --- HEADER APLIKASI ---
+# --- HEADER APLIKASI UTAMA ---
 st.title("⚽ Rapor Evaluasi Pemain U17")
 st.subheader("Bintang Galaxy Football Academy")
 st.write("---")
@@ -142,7 +198,6 @@ st.write("---")
 # ==========================================
 st.header("📊 Input Evaluasi (Skala 1-5)")
 
-# Pemilihan Periode Bulan & Tahun
 col_periode1, col_periode2 = st.columns(2)
 with col_periode1:
     bulan_evaluasi = st.selectbox("Bulan Evaluasi", ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"], index=9)
@@ -189,7 +244,6 @@ if st.button("Simpan & Lihat Rapor", type="primary"):
         st.header(f"📋 Laporan Perkembangan Pemain - {bulan_evaluasi} {tahun_evaluasi}")
         st.success(f"**Data atas nama {nama_pemain.upper()} berhasil diproses.**")
         
-        # Kalkulasi Kesimpulan
         total_skor = sum(nilai_baru.values())
         rata_rata = total_skor / len(nilai_baru)
         if rata_rata >= 4.5: predikat = "SANGAT BAIK (Pemain Menonjol)"
@@ -204,18 +258,23 @@ if st.button("Simpan & Lihat Rapor", type="primary"):
         df_rapor = pd.DataFrame([{"Aspek Penilaian": k, "Nilai (1-5)": v} for k, v in nilai_baru.items()])
         st.table(df_rapor)
 
-        path_logo_temp = "temp_logo.jpg" if file_logo else None
-        path_foto_temp = "temp_foto.jpg" if file_foto else None
-        
+        # Penanganan Format Logo & Foto (PNG / JPG)
         if file_logo:
+            ext_logo = file_logo.name.split(".")[-1]
+            path_logo_temp = f"temp_logo.{ext_logo}"
             with open(path_logo_temp, "wb") as f: f.write(file_logo.getbuffer())
-        if file_foto:
-            with open(path_foto_temp, "wb") as f: f.write(file_foto.getbuffer())
+        else:
+            path_logo_temp = None
 
-        # Proses PDF
+        if file_foto:
+            ext_foto = file_foto.name.split(".")[-1]
+            path_foto_temp = f"temp_foto.{ext_foto}"
+            with open(path_foto_temp, "wb") as f: f.write(file_foto.getbuffer())
+        else:
+            path_foto_temp = None
+
         file_pdf = buat_pdf(nama_pemain, tempat_lahir, tanggal_lahir, usia, posisi, nilai_baru, catatan_pelatih, rata_rata, predikat, bulan_evaluasi, tahun_evaluasi, path_logo_temp, path_foto_temp)
         
-        # Tombol Download PDF
         with open(file_pdf, "rb") as pdf_file:
             PDFbyte = pdf_file.read()
             
@@ -226,7 +285,6 @@ if st.button("Simpan & Lihat Rapor", type="primary"):
             mime="application/pdf",
         )
         
-        # Membersihkan file sementara setelah PDF siap
         os.remove(file_pdf)
         if path_logo_temp and os.path.exists(path_logo_temp): os.remove(path_logo_temp)
         if path_foto_temp and os.path.exists(path_foto_temp): os.remove(path_foto_temp)
